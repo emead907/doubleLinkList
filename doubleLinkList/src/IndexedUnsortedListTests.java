@@ -30,7 +30,7 @@ public class IndexedUnsortedListTests
 	
 		if(listType.equals(ListType.goodList))
 		{
-		    newList = new GoodList<Character>();
+		    //newList = new GoodList<Character>();
 		}
 		else if(listType.equals(ListType.arrayList))
 		{
