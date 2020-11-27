@@ -65,7 +65,7 @@ public class DLLNode<T> {
 	 * Returns the node previous to the current node
 	 * @return the previous node (the node stored in previous)
 	 */
-	public DLLNode<T> getprevious()
+	public DLLNode<T> getPrevious()
 	{
 		return previous;
 	}
@@ -81,6 +81,6 @@ public class DLLNode<T> {
 	
 	public String toString()
 	{
-		return "Element: " + element.toString() + "/nHas next: " + (next != null) + "/nHas previous: " + (previous != null);
+		return "Element: " + element.toString() + " Has next: " + (next != null) + " Has previous: " + (previous != null);
 	}
 }
