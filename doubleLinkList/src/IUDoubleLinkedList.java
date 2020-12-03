@@ -1,3 +1,4 @@
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
@@ -375,20 +376,243 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 
 	@Override
 	public Iterator<T> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+		return new DLLIterator();
 	}
 
 	@Override
 	public ListIterator<T> listIterator() {
-		// TODO Auto-generated method stub
-		return null;
+		return new DLLIterator();
 	}
 
 	@Override
 	public ListIterator<T> listIterator(int startingIndex) {
-		// TODO Auto-generated method stub
-		return null;
+		return new DLLIterator(startingIndex);
+	}
+	
+	/**
+	 * List iterator for IUDoubleLinkList
+	 * @author emilymead
+	 */
+	
+	private class DLLIterator implements ListIterator<T>
+	{
+		private DLLNode<T> next;
+		private int nextIndex;
+		private int counter;
+		private DLLNode<T> lastR;
+		
+		/**
+		 * Creates an default iterator 
+		 */
+		public DLLIterator()
+		{
+			next = head;
+			nextIndex = 0;
+			counter = modCount;
+		}
+		
+		/**
+		 * Creates an iterator that starts at a given starting index
+		 * @param startingIndex Index of the element that the 
+		 * iterator will start at
+		 */
+		public DLLIterator(int startingIndex)
+		{
+			if(startingIndex < 0 || startingIndex > size)
+			{
+				throw new IndexOutOfBoundsException();
+			}
+			
+			next = head;
+			counter = modCount;
+			lastR = null;
+			for(nextIndex = 0; nextIndex < startingIndex; nextIndex++)
+			{
+				next = next.getNext();
+			}
+			
+		}
+
+		@Override
+		public void add(T arg0) {
+			
+			//check for changes
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			DLLNode<T> newNode = new DLLNode<T>(arg0);
+			newNode.setNext(next);
+			//check what next is to catch special cases
+			
+			//next in the middle
+			if(next != null)
+			{
+				newNode.setPrevious(next.getPrevious());
+				next.setPrevious(newNode);
+			}
+			else //next is after tail
+			{
+				newNode.setPrevious(tail);
+				tail = newNode;
+			}
+			
+			//checking if next is head
+			if(next != head)
+			{
+				newNode.getPrevious().setNext(newNode);
+			}
+			else //next is head
+			{
+				head = newNode;
+			}
+			
+			//keep track of changes
+			size++;
+			counter++;
+			modCount++;
+			nextIndex++;
+			lastR = null;
+		}
+
+		@Override
+		public boolean hasNext() {
+			//check changes
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			return next != null;
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			return next != head;
+		}
+
+		@Override
+		public T next() {
+			if(!hasNext())
+			{
+				throw new NoSuchElementException();
+			}
+			T returnMe = next.getElement();
+			lastR = next;
+			next = next.getNext();
+			nextIndex++;
+			//System.out.println("nextg: " + returnMe);
+			return returnMe;
+		}
+
+		@Override
+		public int nextIndex() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			//System.out.println(nextIndex);
+			return nextIndex;
+		}
+
+		@Override
+		public T previous() {
+			if(!hasPrevious())
+			{
+				throw new NoSuchElementException();
+			}
+			if(next != null)
+			{
+				next = next.getPrevious();
+			}
+			else
+			{
+				next = tail;
+			}
+			nextIndex--;
+			lastR = next;
+			//System.out.println("Previous: " + next);
+			return next.getElement();
+			
+		}
+
+		@Override
+		public int previousIndex() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			System.out.println(nextIndex);
+			return (nextIndex - 1);
+		}
+
+		@Override
+		public void remove() {
+			//check changes
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			//check for the last returned element
+			if(lastR == null)
+			{
+				throw new IllegalStateException();
+			}
+			if(size == 1)
+			{
+				head = null;
+				tail = null;
+			}
+			else if(lastR == head)
+			{
+				lastR.getNext().setPrevious(null);
+				head = lastR.getNext();
+				lastR.setNext(null);
+			}
+			else if(lastR == tail)
+			{
+				lastR.getPrevious().setNext(null);
+				tail = lastR.getPrevious();
+				lastR.setPrevious(null);
+			}
+			else
+			{
+				//middle case
+				//setting previous to next
+				lastR.getPrevious().setNext(lastR.getNext());
+				//setting next to previous
+				lastR.getNext().setPrevious(lastR.getPrevious());
+				//lastR.setNext(null);
+				//lastR.setPrevious(null);
+			}
+			
+			//updating counters
+			size--;
+			modCount++;
+			counter++;
+			lastR = null;
+		}
+
+		@Override
+		public void set(T arg0) {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(lastR == null)
+			{
+				throw new IllegalStateException();
+			}
+			lastR.setElement(arg0);
+			
+			modCount++;
+			counter++;
+			lastR = null;
+		}
+		
 	}
 
 }
