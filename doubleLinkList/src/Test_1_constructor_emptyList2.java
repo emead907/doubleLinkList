@@ -4,7 +4,7 @@
  * 
  * @author CS 221
  */
-public class Test_1_constructor_emptyList
+public class Test_1_constructor_emptyList2
 {
 	// List running tests on
 	IndexedUnsortedList<Character> list;
@@ -16,7 +16,7 @@ public class Test_1_constructor_emptyList
 		private static final String testDescription = 
 				"Change Scenario 1: no list -> constructor -> empty list"; 
 		// Number of tests run 
-		private static final int NUM_TESTS = 21; 
+		private static final int NUM_TESTS = 20; 
 		// Type of list using in tests
 		private ListType listType; 
 
@@ -104,6 +104,11 @@ public class Test_1_constructor_emptyList
 			result = IndexedUnsortedListTests.size(list, SIZE); 
 			RunIndexedUnsortedTests.printResults("size()", result);
 			
+			// Test: iterator()
+			initialize(); 
+			result = IndexedUnsortedListTests.iterator(list); 
+			RunIndexedUnsortedTests.printResults("iterator()", result);
+					
 			// Test: addToFront(ELEMENT)
 			initialize(); 
 			result = IndexedUnsortedListTests.addToFront(list, ELEMENT, Result.NoException); 
@@ -158,21 +163,6 @@ public class Test_1_constructor_emptyList
 			initialize(); 
 			result = IndexedUnsortedListTests.indexOf(list, INVALID_ELEMENT, INVALID_INDEX, Result.MatchingValue); 
 			RunIndexedUnsortedTests.printResults("indexOf(INVALID_ELEMENT)", result);
-			
-			// Test: iterator()
-			initialize(); 
-			result = IndexedUnsortedListTests.iterator(list); 
-			RunIndexedUnsortedTests.printResults("iterator()", result);
-				
-			// Test: listIterator()
-			initialize(); 
-			result = IndexedUnsortedListTests.listIterator(list); 
-			RunIndexedUnsortedTests.printResults("listIterator()", result);
-				
-			// Test: listIterator(int)
-			initialize(); 
-			result = IndexedUnsortedListTests.listIterator(list, INVALID_INDEX, Result.IndexOutOfBounds); 
-			RunIndexedUnsortedTests.printResults("listIterator(INVALID_INDEX)", result);
 				
 		} 
 		catch (Exception e) 

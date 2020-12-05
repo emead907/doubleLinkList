@@ -1,0 +1,597 @@
+public void add(T arg0) {
+			
+			//check for changes
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			DLLNode<T> newNode = new DLLNode<T>(arg0);
+			newNode.setNext(next);
+			//check what next is to catch special cases
+			
+			//next in the middle
+			if(next != null)
+			{
+				newNode.setPrevious(next.getPrevious());
+				next.setPrevious(newNode);
+			}
+			else //next is after tail
+			{
+				newNode.setPrevious(tail);
+				tail = newNode;
+			}
+			
+			//checking if next is head
+			//System.out.println("Next: " + next);
+			//System.out.println("head: " + head);
+			if(next != head)
+			{
+				newNode.getPrevious().setNext(newNode);
+			}
+			else //next is head
+			{
+				head = newNode;
+			}
+			
+			//keep track of changes
+			size++;
+			counter++;
+			modCount++;
+			nextIndex++;
+			lastR = null;
+		}
+
+		@Override
+		public boolean hasNext() {
+			//check changes
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(next == null)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			return next != head;
+		}
+
+		@Override
+		public T next() {
+			if(!hasNext())
+			{
+				throw new NoSuchElementException();
+			}
+			T returnMe = next.getElement();
+			lastR = next;
+			next = next.getNext();
+			nextIndex++;
+			return returnMe;
+		}
+
+		@Override
+		public int nextIndex() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			//System.out.println(nextIndex);
+			return nextIndex;
+		}
+
+		@Override
+		public T previous() {
+			if(!hasPrevious())
+			{
+				throw new NoSuchElementException();
+			}
+			System.out.println("hi: " + next);
+			if(next == null)
+			{
+				next = tail;
+			}
+			else
+			{
+				next = next.getPrevious();
+			}
+			nextIndex--;
+			lastR = next;
+			//System.out.println("Previous: " + next);
+			return next.getElement();
+			
+		}
+
+		@Override
+		public int previousIndex() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			return (nextIndex - 1);
+		}
+
+		@Override
+		public void remove() {
+			//check changes
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			
+			//check for the last returned element
+			if(lastR == null)
+			{
+				throw new IllegalStateException();
+			}
+			if(size == 1)
+			{
+				head = null;
+				tail = null;
+			}
+			else if(lastR == head)
+			{
+				lastR.getNext().setPrevious(null);
+				head = lastR.getNext();
+				lastR.setNext(null);
+			}
+			else if(lastR == tail)
+			{
+				lastR.getPrevious().setNext(null);
+				tail = lastR.getPrevious();
+				lastR.setPrevious(null);
+			}
+			else
+			{
+				//middle case
+				//setting previous to next
+				lastR.getPrevious().setNext(lastR.getNext());
+				//setting next to previous
+				lastR.getNext().setPrevious(lastR.getPrevious());
+				//lastR.setNext(null);
+				//lastR.setPrevious(null);
+			}
+			
+			//updating counters
+			size--;
+			modCount++;
+			counter++;
+			lastR = null;
+		}
+
+		@Override
+		public void set(T arg0) {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(lastR == null)
+			{
+				throw new IllegalStateException();
+			}
+			lastR.setElement(arg0);
+			
+			modCount++;
+			counter++;
+			lastR = null;
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		@Override
+		public void add(T arg0) {
+			//check counters
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			//create the new node 
+			DLLNode<T> newNode = new DLLNode<T>(arg0);
+			if(size == 0)
+			{
+				head = newNode;
+				tail = newNode;
+			}
+			newNode.setNext(next);
+			next.setPrevious(newNode);
+			if(next == head)
+			{
+				head = newNode;
+			}
+			else
+			{
+				newNode.setPrevious(next.getPrevious());
+				next.getPrevious().setNext(newNode);
+			}
+			
+			//count changes
+			size++;
+			modCount++;
+			counter++;
+			lastR = null;
+		
+			
+		}
+
+		@Override
+		public boolean hasNext() {
+			//check counters
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(next != null)
+			{
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(next == head)
+			{
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public T next() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(!hasNext())
+			{
+				throw new NoSuchElementException();
+			}
+			T returnMe = next.getElement();
+			lastR = next;
+			next = next.getNext();
+			nextIndex++;
+			return returnMe;
+			
+		}
+
+		@Override
+		public int nextIndex() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			return nextIndex;
+		}
+
+		@Override
+		public T previous() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(!hasPrevious())
+			{
+				throw new NoSuchElementException();
+			}
+			DLLNode<T> previousNode = next.getPrevious();
+			T returnMe = previousNode.getElement();
+			lastR = previousNode;
+			next = previousNode;
+			nextIndex--;
+			return returnMe;
+		}
+
+		@Override
+		public int previousIndex() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			return (nextIndex - 1);
+		}
+
+		@Override
+		public void remove() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			//if next or previous has not been called last
+			if(lastR == null)
+			{
+				throw new IllegalStateException();
+			}
+			//if its the only value in the list
+			if(size == 1)
+			{
+				head = null;
+				tail = null;
+				size = 0;
+			}
+			//if its the head
+			if(lastR == head)
+			{
+				/**
+				if(head != next)
+				{
+					nextIndex--;
+				}
+				*/
+				head.getNext().setPrevious(null);
+				head = head.getNext();
+				size--;
+			}
+			//if its the tail
+			else if(lastR == tail)
+			{
+				lastR.getPrevious().setNext(null);
+				tail = lastR.getPrevious();
+				lastR.setPrevious(null);
+			/**
+				if(tail != next)
+				{
+					nextIndex--;
+				}
+				*/
+			}
+			//if its in the middle
+			else
+			{
+				DLLNode<T> previousNode = lastR.getPrevious();
+				DLLNode<T> nextNode = lastR.getNext();
+				previousNode.setNext(nextNode);
+				nextNode.setPrevious(previousNode);
+				lastR.setNext(null);
+				lastR.setPrevious(null);
+				/**
+				if(lastR != next)
+				{
+					nextIndex--;
+				}
+				*/
+			}
+	
+			//update things
+			modCount++;
+			counter++;
+			lastR = null;
+		}
+
+		@Override
+		public void set(T arg0) {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(lastR == null)
+			{
+				throw new IllegalStateException();
+			}
+			lastR.setElement(arg0);
+			
+			modCount++;
+			counter++;
+			lastR = null;
+
+			
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		public void add(T arg0) {
+					
+			//check counters
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			//create the new node 
+			DLLNode<T> newNode = new DLLNode<T>(arg0);
+			newNode.setNext(next);
+			
+			if(next != null)
+			{
+				newNode.setPrevious(next.getPrevious());
+				next.setPrevious(newNode);
+			}
+			else
+			{
+				newNode.setPrevious(tail);
+				tail = newNode;
+			}
+			
+			if(next == head)
+			{
+				head = newNode;
+			}
+			else
+			{
+				next.getPrevious().setNext(newNode);
+			}
+			
+			//count changes
+			size++;
+			modCount++;
+			counter++;
+			nextIndex++;
+			lastR = null;
+		}
+
+		@Override
+		public boolean hasNext() {
+			//check changes
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(next == null)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		@Override
+		public boolean hasPrevious() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			DLLNode<T> previousN = next.getPrevious();
+			if(previousN == null)
+			{
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		@Override
+		public T next() {
+			if(!hasNext())
+			{
+				throw new NoSuchElementException();
+			}
+			T returnMe = next.getElement();
+			lastR = next;
+			next = next.getNext();
+			nextIndex++;
+			return returnMe;
+		}
+
+		@Override
+		public int nextIndex() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			//System.out.println(nextIndex);
+			return nextIndex;
+		}
+
+		@Override
+		public T previous() {
+			if(!hasPrevious())
+			{
+				throw new NoSuchElementException();
+			}
+		
+			if(next == null)
+			{
+				next = tail;
+			}
+			else if (next != null)
+			{
+				next = next.getPrevious();
+			}
+			nextIndex--;
+			lastR = next;
+			//System.out.println("Previous: " + next);
+			return next.getElement();
+			
+		}
+
+		@Override
+		public int previousIndex() {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			return (nextIndex - 1);
+		}
+
+		@Override
+		public void remove() {
+			//check changes
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			
+			//check for the last returned element
+			if(lastR == null)
+			{
+				throw new IllegalStateException();
+			}
+			
+			if(lastR != head)
+			{
+				lastR.getPrevious().setNext(lastR.getNext());
+			}
+			else
+			{
+				head = lastR.getNext();
+			}
+			
+			if(lastR != tail)
+			{
+				lastR.getNext().setPrevious(lastR.getPrevious());
+			}
+			else
+			{
+				tail = lastR.getPrevious();
+			}
+			
+			if(next == lastR)
+			{
+				next = next.getNext();
+			}
+			else
+			{
+				nextIndex--;
+			}
+			
+			//updating counters
+			size--;
+			modCount++;
+			counter++;
+			lastR = null;
+		}
+
+		@Override
+		public void set(T arg0) {
+			if(counter != modCount)
+			{
+				throw new ConcurrentModificationException();
+			}
+			if(lastR == null)
+			{
+				throw new IllegalStateException();
+			}
+			lastR.setElement(arg0);
+			
+			modCount++;
+			counter++;
+			lastR = null;
+		}

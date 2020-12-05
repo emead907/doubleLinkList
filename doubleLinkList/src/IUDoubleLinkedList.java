@@ -70,7 +70,6 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 	@Override
 	public void add(T element) {
 		addToRear(element);
-		
 	}
 
 	@Override
@@ -109,7 +108,53 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 		modCount++;
 		
 	}
-
+		//this one fixes some areas but makes more errors other places
+//	@Override
+//	public void add(int index, T element) {
+//		if(index < 0 || index > size)
+//		{
+//			throw new IndexOutOfBoundsException();
+//		}
+//		
+//		DLLNode<T> newNode = new DLLNode<T>(element);
+//		DLLNode<T> current = head;
+//		
+//		for(int i = 0; i < index - 1; i++)
+//		{
+//			current = current.getNext();
+//		}
+//		System.out.println(current);
+//		if(index == size && size != 0)
+//		{
+//			tail.setNext(newNode);
+//			newNode.setPrevious(tail);
+//			tail = newNode;
+//		}
+//		else if(index == 0)
+//		{
+//			current.setPrevious(newNode);
+//			newNode.setNext(current);
+//			if(head == current)
+//			{
+//				head = newNode;
+//			}
+//		}
+//		else if(current == null)
+//		{
+//			head = newNode;
+//			tail = newNode;
+//		}
+//		else
+//		{
+//			newNode.setNext(current.getNext());
+//			current.setNext(newNode);
+//			newNode.getNext().setPrevious(newNode);
+//			newNode.setPrevious(current);
+//		}
+//	
+//		size++;
+//		modCount++;
+//	}
 	@Override
 	public void add(int index, T element) {
 		if(index < 0 || index > size)
@@ -119,23 +164,83 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 		
 		DLLNode<T> newNode = new DLLNode<T>(element);
 		DLLNode<T> current = head;
+		int currentIndex = 0;
+		boolean found = false;
 		
-		for(int i = 0; i < index - 1; i++)
+		if(index != size)
 		{
-			current = current.getNext();
+			while(!found && current != null)
+			{
+				if(currentIndex == index)
+				{
+					found = true;
+				}
+				else
+				{
+					currentIndex++;
+					current = current.getNext();
+				}
+			}
+			if(current != head)
+			{
+				//System.out.println(current);
+				newNode.setPrevious(current.getPrevious());
+				current.getPrevious().setNext(newNode);
+				newNode.setNext(current);
+				current.setPrevious(newNode);
+				size++;
+				modCount++;
+			}
+			else
+			{
+				newNode.setNext(current);
+				current.setPrevious(newNode);
+				head = newNode;
+				size++;
+				modCount++;
+			}
+			
+			
 		}
-		
-		if(!isEmpty())
+		else //add it to the end
 		{
-			addAfter(element, current.getElement());
-		}
-		else
-		{
-			head = newNode;
-			tail = newNode;
+			addToRear(element);
 		}
 	
+//		if(!isEmpty())
+//		{
+//			if(current == head)
+//			{
+//				head = newNode;
+//			}
+//			else
+//			{
+//				newNode.setPrevious(current.getPrevious());
+//				current.getPrevious().setNext(newNode);
+//			}
+//			
+//			newNode.setNext(current);
+//			current.setPrevious(newNode);
+//			
+//			
+//			//addAfter(element, current.getElement());
+//		}
+//		else
+//		{
+//			head = newNode;
+//			tail = newNode;
+//		}
+		
+//		DLLNode<T> ahh = head;
+//		System.out.println(ahh);
+//		while(ahh != null)
+//		{
+//			System.out.println(ahh);
+//			ahh = ahh.getNext();
+//		}
+	
 	}
+	
 
 	@Override
 	public T removeFirst() {
@@ -189,6 +294,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 	
 			current = current.getNext();
 		}
+		System.out.println("Current" + current);
+		
 		DLLNode<T> next = current.getNext();
 		if(current != head)
 		{
@@ -198,6 +305,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			if(current == tail)
 			{
 				tail = previous;
+				tail.setNext(null);
 			}
 			else
 			{
@@ -210,10 +318,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			current.setNext(null);
 			current.setPrevious(null);
 			head = next;
-			head.setNext(null);
+			head.setPrevious(null);
 		}
-		
-		
 		
 		size--;
 		modCount++;
@@ -408,7 +514,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 		{
 			next = head;
 			nextIndex = 0;
-			counter = modCount;
+			counter = modCount;		
 		}
 		
 		/**
@@ -418,7 +524,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 		 */
 		public DLLIterator(int startingIndex)
 		{
-			if(startingIndex < 0 || startingIndex > size)
+			if(startingIndex < 0 || startingIndex >= size)
 			{
 				throw new IndexOutOfBoundsException();
 			}
@@ -433,7 +539,6 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			
 		}
 
-		@Override
 		public void add(T arg0) {
 			
 			//check for changes
@@ -458,6 +563,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			}
 			
 			//checking if next is head
+			//System.out.println("Next: " + next);
+			//System.out.println("head: " + head);
 			if(next != head)
 			{
 				newNode.getPrevious().setNext(newNode);
@@ -482,7 +589,22 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			{
 				throw new ConcurrentModificationException();
 			}
-			return next != null;
+			//System.out.println("This is next: " + next);
+//			if(size == 0)
+//			{
+//				return false;
+//			}
+			System.out.println(next);
+			if(next == null)
+			{
+				System.out.println("false");
+				return false;
+			}
+			else
+			{
+				System.out.println("true");
+				return true;
+			}
 		}
 
 		@Override
@@ -491,6 +613,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			{
 				throw new ConcurrentModificationException();
 			}
+
 			return next != head;
 		}
 
@@ -504,7 +627,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			lastR = next;
 			next = next.getNext();
 			nextIndex++;
-			//System.out.println("nextg: " + returnMe);
+			System.out.println(returnMe);
 			return returnMe;
 		}
 
@@ -514,7 +637,6 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			{
 				throw new ConcurrentModificationException();
 			}
-			//System.out.println(nextIndex);
 			return nextIndex;
 		}
 
@@ -524,13 +646,14 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			{
 				throw new NoSuchElementException();
 			}
-			if(next != null)
+			
+			if(next == null)
 			{
-				next = next.getPrevious();
+				next = tail;
 			}
 			else
 			{
-				next = tail;
+				next = next.getPrevious();
 			}
 			nextIndex--;
 			lastR = next;
@@ -545,31 +668,37 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			{
 				throw new ConcurrentModificationException();
 			}
-			System.out.println(nextIndex);
 			return (nextIndex - 1);
 		}
 
 		@Override
 		public void remove() {
 			//check changes
+			System.out.println("im runnign");
 			if(counter != modCount)
 			{
 				throw new ConcurrentModificationException();
 			}
+			
 			//check for the last returned element
 			if(lastR == null)
 			{
 				throw new IllegalStateException();
 			}
-			if(size == 1)
+			//System.out.println("Size: " + size);
+			if(size <= 1)
 			{
 				head = null;
 				tail = null;
+				next = null;
+				lastR = null;
 			}
-			else if(lastR == head)
+			else if(lastR.equals(head))
 			{
+				
 				lastR.getNext().setPrevious(null);
 				head = lastR.getNext();
+				next = lastR.getNext();
 				lastR.setNext(null);
 			}
 			else if(lastR == tail)
@@ -577,6 +706,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 				lastR.getPrevious().setNext(null);
 				tail = lastR.getPrevious();
 				lastR.setPrevious(null);
+				next = null;
 			}
 			else
 			{
@@ -585,15 +715,21 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 				lastR.getPrevious().setNext(lastR.getNext());
 				//setting next to previous
 				lastR.getNext().setPrevious(lastR.getPrevious());
+				if(next == lastR)
+				{
+					next = lastR.getNext();
+				}
 				//lastR.setNext(null);
 				//lastR.setPrevious(null);
 			}
 			
+			//System.out.println(lastR + " : " + lastR.getNext());
 			//updating counters
 			size--;
 			modCount++;
 			counter++;
 			lastR = null;
+			//System.out.println(size);
 		}
 
 		@Override
@@ -612,6 +748,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 			counter++;
 			lastR = null;
 		}
+		
 		
 	}
 
